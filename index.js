@@ -28,7 +28,7 @@ async function run() {
     await client.connect();
     // Send a ping to confirm a successful connection
     const laptopCollection = client.db("laptopShopCart").collection("allProducts");
-
+    const cartCollection = client.db("laptopShopCart").collection("carts");
     app.get('/allproducts', async(req,res)=>{
         const result = await laptopCollection.find().toArray();
         res.send(result);
@@ -37,10 +37,22 @@ async function run() {
     app.get('/allproducts/:id', async(req,res)=>{
       const id = req.params.id;
       const query ={_id: new ObjectId(id)};
-
       const result = await laptopCollection.findOne(query);
       res.send(result);
     })
+    // Cart collection
+    app.post('/carts', async(req,res)=>{
+      const item = req.body;
+      console.log(item)
+      const result = await cartCollection.insertOne(item);
+      res.send(result);
+    })
+
+    app.get('/carts', async(req,res)=>{
+      const result= await cartCollection.find().toArray();
+      res.send(result);
+    })
+
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
